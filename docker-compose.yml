@@ -5,16 +5,24 @@ services:
     build:
       context: .
     volumes:
-      - app:/app
+      - .:/app
     ports:
       - "80:8000"
     networks:
       - network_app
     environment:
-      SECRET_KEY: ${SECRET_KEY}
-      DEBUG: ${DEBUG}
+      SECRET_KEY: 'django-insecure-pjnbudk(+-8r+&@$fgx2#indc3-3!mbgrtnh07n*m*!ldyd&!_'
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      DEBUG: False
     env_file:
-      - .env
+      - .env  # Carrega variáveis de ambiente do arquivo .env
     command: >
-      bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --insecurite"
+      bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --insecure"
     restart: unless-stopped
+
+volumes:
+  app:
+
+networks:
+  network_app:
+
