@@ -12,29 +12,46 @@
 <body>
   {% if messages %}
     {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible d-flex align-items-center fade show position-absolute fixed-top">
+      <div class="alert alert-{{ message.tags }} alert-dismissible d-flex align-items-center fade show position-fixed top-0 start-0 w-100">
         <strong class="mx-2">{{ message.tags }}!</strong> {{ message }}
       </div>
     {% endfor %}
   {% endif %}
   <!-- End Alert -->
 
-  <div class="container-fluid d-flex flex-column">
+  <div class="container-fluid d-flex flex-column min-vh-100">
     <!-- Header -->
     {% block header %}
     {% include "fragments/header.html" %}
     {% endblock %}
 
-    <!-- Main Content Wrapper -->
     <div class="row flex-grow-1">
-    <!-- Sidebar -->
-    {% block sidebar %}
-    {% include "fragments/sidebar.html" %}
-    {% endblock %}
+      <!-- Sidebar (convertido em offcanvas para mobile) -->
+      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light p-0">
+        <button class="btn btn-primary d-md-none my-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+          Menu
+        </button>
+        <div class="offcanvas offcanvas-start d-md-none" id="offcanvasSidebar" tabindex="-1" aria-labelledby="offcanvasSidebarLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasSidebarLabel">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body p-0">
+            {% include "fragments/sidebar.html" %}
+          </div>
+        </div>
+        
+        <!-- Sidebar visible in larger screens -->
+        <div class="d-none d-md-block">
+          {% include "fragments/sidebar.html" %}
+        </div>
+      </nav>
 
       <!-- Main Content -->
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"></div>
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">Dashboard</h1>
+        </div>
         <div>{% block content %}{% endblock %}</div>
       </main>
     </div>
