@@ -1,0 +1,52 @@
+{% extends 'fragments/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+  <h2 class="text-center">Host</h2>
+  <form action="" method="post">
+    {% csrf_token %}
+    <div class="custom-file mb-3">
+      {% if form.host_ip.field.required %}
+          <label for="host_ip" class="form-label">IP do Host <span class="text-danger">*</span></label>
+      {% else %}
+          <label for="host_ip" class="form-label">IP do Host</label>
+      {% endif %}
+      {{ form.host_ip|attr:"class:form-control form-control-lg"|attr:"placeholder:IP do host ou hostname"|attr:"id:host_ip"|attr:"name:host_ip" }}
+    </div>
+      
+    <div class="custom-file mb-3">
+      {% if form.host_user.field.required %}
+          <label for="host_ip" class="form-label">Usuário do Host <span class="text-danger">*</span></label>
+      {% else %}
+          <label for="host_ip" class="form-label">Usuário do Host</label>
+      {% endif %}
+      {{ form.host_user|attr:"class:form-control form-control-lg"|attr:"placeholder:Usuário, exemplo, root ou admin"|attr:"id:host_user"|attr:"name:host_user" }}
+    </div>
+
+    <div class="custom-file mb-3">
+      {% if form.host_password.field.required %}
+          <label for="host_password" class="form-label">Password do Host <span class="text-danger">*</span></label>
+      {% else %}
+          <label for="host_password" class="form-label">Password do Host</label>
+      {% endif %}
+      <input type="password" class="form-control form-control-lg" id="password" name="password">
+      <input type="hidden" value="{{ form.instance.host_password }}" name="host_password" id="host_password">
+    </div>
+
+    <div class="custom-file mb-3">
+      {% if form.host_dir.field.required %}
+          <label for="host_dir" class="form-label">Diretorio do Host <span class="text-danger">*</span></label>
+      {% else %}
+          <label for="host_dir" class="form-label">Diretorio do Host</label>
+      {% endif %}
+      {{ form.host_dir|attr:"class:form-control form-control-lg"|attr:"placeholder:Caminho absoluto do diretório onde ficará temporariamente o arquivo exemplo, /temp/arquivo/"|attr:"id:host_dir"|attr:"name:host_dir" }}
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg btn-block w-100">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
+        <path d="M11 2H9v3h2z"/>
+        <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z"/>
+      </svg>
+    </button>
+  </form>
+{% endblock %}

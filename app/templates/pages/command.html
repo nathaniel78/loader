@@ -1,0 +1,93 @@
+{% extends 'fragments/base.html' %}
+{% block content %}
+    <h2 class="text-center text-primary">Comandos</h2>
+
+    <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th class="col-2 text-primary">Nome</th>
+                    <th class="col-2 text-primary">Descrição</th>
+                    <th class="col-2 text-primary">Comando executado antes</th>
+                    <th class="col-2 text-primary">Comando executado depois</th>
+                    <th class="col-1 text-primary">Data cadastro</th>
+                    <th class="col-1 text-primary">Data Atualização</th>
+                    <th class="col-2 text-primary">Opções</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for command in commands %}
+                <tr>
+                    <td>{{ command.name|truncatewords:10 }}</td>
+                    <td>{{ command.description|truncatewords:10 }}</td>
+                    <td>{{ command.command_before|truncatewords:20 }}</td>
+                    <td>{{ command.command_after|truncatewords:20 }}</td>
+                    <td>{{ command.date_create|date:"d/m/Y H:m:s" }}</td>
+                    <td>{{ command.date_update|date:"d/m/Y H:m:s" }}</td>
+                    <td>
+                        </a>
+                        <a class="btn btn-warning" data-toggle="popover" data-placement="top" data-content="editar"
+                        data-trigger="hover" href="{% url 'command_update' command.id %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                            <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                          </svg>
+                        </a>
+                        <a  class="btn btn-danger" data-toggle="popover" data-placement="top" data-content="Remover" 
+                        data-trigger="hover" href="{% url 'command_delete' command.id %}" 
+                        onclick="return confirm('Tem certeza que deseja excluir?');">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                          </svg>
+                        </a>
+                    </td>
+                    {% empty %}
+                    <td class="text-center" colspan="7">
+                        <span class="fs-3 text-uppercase">sem registros</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- nav pagination -->
+        {% comment %} <nav class="w-25 mx-auto">
+            {% if hosts.has_other_pages %}
+            <ul class="pagination w-75 mx-auto mt-2">
+                {% if alunos.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ alunos.previous_page_number }}">Anterior </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">Anterior </span></li>
+                {% endif %}
+
+                {% for i in alunos.paginator.page_range %}
+                {% if alunos.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if alunos.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ alunos.next_page_number }}">Próximo</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">Próximo</span></li>
+                {% endif %}
+            </ul>
+            {% endif %}
+        </nav> {% endcomment %}
+        <!-- nav pagination -->
+    </div>
+
+    <a href="{% url 'command_form' %}" class="btn btn-primary btn-lg btn-block w-100">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+          </svg>
+    </a>
+{% endblock %}
