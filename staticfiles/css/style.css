@@ -1,0 +1,43 @@
+/* Garante que o body e a página usem a altura total da janela */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .container-fluid {
+    flex: 1; /* Expande para preencher o espaço entre o header e o footer */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .row {
+    flex: 1;
+  }
+
+  .sidebar {
+    height: 100%;
+  }
+
+  .custom-link {
+    text-decoration: none;
+    }
+
+    .custom-link:hover {
+        text-decoration: underline;
+    }
+
+  /* Footer */
+  footer {
+    background-color: #0d6efd;
+  }
+
+  .link-custom-footer {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .link-custom-footer:hover {
+      text-decoration: underline;
+  }
