@@ -10,15 +10,58 @@ from django.contrib import messages
 from .utils import hash_person, pagination_utils
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth import authenticate, login, logout
 from .forms import (
     HostForm, 
-    CommandForm
+    CommandForm,
+    CustomLoginForm,
 )
 
 logger = logging.getLogger(__name__)
 
 
-# View para upload
+# View login
+class LoginView(View):
+    def get(self, request):
+        form_login = CustomLoginForm()
+        context = {'form_login': form_login}
+        return render(request, 'pages/login.html', context)
+
+    def post(self, request):
+        try:
+            form_login = CustomLoginForm(request, data=request.POST)
+            if form_login.is_valid():
+                username = form_login.cleaned_data["username"]
+                print(username)
+                password = form_login.cleaned_data["password"]
+                user = authenticate(request, username=username, password=password)
+
+                if user is not None:
+                    if not user.ativo:
+                        messages.add_message(request, constants.INFO, 
+                                             'Usuário inativo, entre em contato com o administrador.')
+                        return redirect('login')
+                    else:
+                        login(request, user)
+                        return redirect('home')
+                else:
+                    messages.add_message(request, constants.INFO, 
+                                         'Credenciais incorretas, tente novamente ou entre em contato com o administrador.')
+                    return redirect('login')
+            else:
+                messages.add_message(request, constants.INFO, 
+                                     'Formulário inválido. Por favor, corrija os erros e tente novamente.')
+
+            context = {'form_login': form_login}
+            return render(request, 'pages/login.html', context)
+        
+        except ValueError:
+            print("Erro ao carregar login em views")
+            messages.add_message(request, constants.ERROR, "Erro ao processar o login.")
+            return redirect('login')
+    
+
+# View upload
 class UploadView(View):
     def get(self, request):
         hosts = Host.objects.all()
@@ -46,7 +89,6 @@ class UploadActionView(View):
             return redirect('home')
         
         password_decrypt = hash_person.PasswordFernetKey.return_hash(host.id)
-        print(f"Senha descriptografada: {password_decrypt}")
 
         # Configurações do Host
         ip = host.host_ip

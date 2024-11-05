@@ -130,3 +130,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = "/app/login"
+
+# Tempo de sessão, tempo abaixo igual a 10 min (6000)
+SESSION_COOKIE_AGE = int(os.environ.get('SESSION_COOKIE_AGE', default=6000))
+
+# Renovar a sessão
+SESSION_SAVE_EVERY_REQUEST = True
