@@ -9,3 +9,4 @@ uploads/*
 **/docker/redis/*
 **/.docker/*
 *.pyc
+*.sqlite3

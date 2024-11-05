@@ -1,0 +1,28 @@
+version: '3'
+services:
+  loader:
+    container_name: loader
+    build:
+      context: .
+    volumes:
+      - .:/app
+    ports:
+      - "80:8000"
+    networks:
+      - network_app
+    environment:
+      SECRET_KEY: 'django-insecure-pjnbudk(+-8r+&@$fgx2#indc3-3!mbgrtnh07n*m*!ldyd&!_'
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      DEBUG: False
+    env_file:
+      - .env  # Carrega variáveis de ambiente do arquivo .env
+    command: >
+      bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --insecure"
+    restart: unless-stopped
+
+volumes:
+  app:
+
+networks:
+  network_app:
+
