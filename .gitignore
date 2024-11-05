@@ -1,0 +1,11 @@
+.env
+env/
+venv/
+uploads/
+uploads/*
+**/backup*
+**/*tmp
+**/docker/banco/mysql/*
+**/docker/redis/*
+**/.docker/*
+*.pyc

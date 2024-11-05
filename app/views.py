@@ -7,10 +7,9 @@ from scp import SCPClient
 from django.views import View
 from .models import Host, Command
 from django.contrib import messages
-from .utils import hash_person
+from .utils import hash_person, pagination_utils
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.hashers import make_password
 from .forms import (
     HostForm, 
     CommandForm
@@ -136,7 +135,8 @@ class UploadActionView(View):
 # View command
 class CommandView(View):
     def get(self, request):
-        commands = Command.objects.all()
+        lista = Command.objects.all()
+        commands = pagination_utils.Pagination.pg_default(request, lista, 10)
         context = {
             'commands': commands,
         }
@@ -213,7 +213,8 @@ class CommandDeleteView(View):
 # View host
 class HostView(View):
     def get(self, request):
-        hosts = Host.objects.all()
+        lista = Host.objects.all()
+        hosts = pagination_utils.Pagination.pg_default(request, lista, 10)
         context = {
             'hosts': hosts,
         }

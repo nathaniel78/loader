@@ -51,19 +51,19 @@
         </table>
 
         <!-- nav pagination -->
-        {% comment %} <nav class="w-25 mx-auto">
-            {% if hosts.has_other_pages %}
+        <nav class="w-25 mx-auto">
+            {% if commands.has_other_pages %}
             <ul class="pagination w-75 mx-auto mt-2">
-                {% if alunos.has_previous %}
+                {% if commands.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ alunos.previous_page_number }}">Anterior </a>
+                    <a class="page-link" href="?page={{ commands.previous_page_number }}">Anterior </a>
                 </li>
                 {% else %}
                 <li class="page-item disabled"><span class="page-link">Anterior </span></li>
                 {% endif %}
 
-                {% for i in alunos.paginator.page_range %}
-                {% if alunos.number == i %}
+                {% for i in commands.paginator.page_range %}
+                {% if commands.number == i %}
                     <li class="page-item active"><span class="page-link">{{ i }}</li>
                 {% else %}
                     <li class="page-item">
@@ -72,16 +72,16 @@
                 {% endif %}
                 {% endfor %}
 
-                {% if alunos.has_next %}
+                {% if commands.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ alunos.next_page_number }}">Próximo</a>
+                    <a class="page-link" href="?page={{ commands.next_page_number }}">Próximo</a>
                 </li>
                 {% else %}
                 <li class="page-item disabled"><span class="page-link">Próximo</span></li>
                 {% endif %}
             </ul>
             {% endif %}
-        </nav> {% endcomment %}
+        </nav>
         <!-- nav pagination -->
     </div>
 
