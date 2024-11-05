@@ -12,12 +12,10 @@ services:
       - network_app
     environment:
       SECRET_KEY: 'django-insecure-pjnbudk(+-8r+&@$fgx2#indc3-3!mbgrtnh07n*m*!ldyd&!_'
-      ALLOWED_HOSTS: localhost,127.0.0.1
-      DEBUG: False
-    env_file:
-      - .env  # Carrega variáveis de ambiente do arquivo .env
+      ALLOWED_HOSTS: "localhost,127.0.0.1"
+      DEBUG: "True"
     command: >
-      bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --insecure"
+      bash -c "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000 --insecure"
     restart: unless-stopped
 
 volumes:
