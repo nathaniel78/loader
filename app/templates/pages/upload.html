@@ -64,58 +64,68 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-      $(document).ready(function() {
-          $('#uploadForm').on('submit', function(event) {
-              // Limpa mensagens de erro anteriores
-              $('#error-message').text('');
-              
-              // Obtém o arquivo do input
-              var fileInput = $('#fileInput')[0];
-              var file = fileInput.files[0];
-              
-              // Verifica se um arquivo foi selecionado
-              if (!file) {
-                  alert('Por favor, selecione um arquivo.'); 
-                  event.preventDefault();
-                  return;
-              }
-              
-              // Valida o tamanho do arquivo (100 MB)
-              var maxSize = 100 * 1024 * 1024;
-              if (file.size > maxSize) {
-                  alert('O arquivo não pode exceder 100 MB.');
-                  event.preventDefault();
-                  return;
-              }
-              
-              // Valida as extensões permitidas
-              var validExtensions = ['zip', 'rar'];
-              var fileExtension = file.name.split('.').pop().toLowerCase();
-              
-              if (!validExtensions.includes(fileExtension)) {
-                  alert('Tipo de arquivo não permitido. Apenas arquivos ZIP, RAR são aceitos.');
-                  event.preventDefault();
-                  return;
-              }
-              
-              // Se passar todas as validações, ajusta a URL de ação
-              const hostId = $('#hostSelect').val();
-              const commandId = $('#commandSelect').val();
-              
-              // Verifica se os IDs são válidos
-              if (hostId === "" || commandId === "") {
-                  alert('Por favor, selecione um host e um comando válidos.');
-                  event.preventDefault();
-                  return;
-              }
+    $(document).ready(function() {
+        // Função de validação
+        function validateForm() {
+            $('#error-message').text('');
 
-              this.action = "{% url 'uploader' 0 0 %}".replace('/0/0/', '/' + hostId + '/' + commandId + '/');
+            var fileInput = $('#fileInput')[0];
+            var file = fileInput.files[0];
 
-              // Mostra o spinner e oculta o formulário
-              $('#loadingSpinner').removeClass('d-none');
-              this.style.display = 'none';
-          });
-      });
-  </script>
+            if (!file) {
+                $('#error-message').text('Por favor, selecione um arquivo.');
+                return false;
+            }
+
+            // Valida o tamanho do arquivo
+            var maxSize = 100 * 1024 * 1024; // 100 MB
+            if (file.size > maxSize) {
+                $('#error-message').text('O arquivo não pode exceder 100 MB.');
+                return false;
+            }
+
+            // Valida as extensões permitidas
+            var validExtensions = ['zip', 'rar'];
+            var fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!validExtensions.includes(fileExtension)) {
+                $('#error-message').text('Tipo de arquivo não permitido. Apenas arquivos ZIP, RAR são aceitos.');
+                return false;
+            }
+
+            // Verifica se os IDs são válidos
+            const hostId = $('#hostSelect').val();
+            const commandId = $('#commandSelect').val();
+            if (hostId === "" || commandId === "") {
+                $('#error-message').text('Por favor, selecione um host e um comando válidos.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Função de envio
+        function submitForm() {
+            const hostId = $('#hostSelect').val();
+            const commandId = $('#commandSelect').val();
+            const actionUrl = "{% url 'uploader' 0 0 %}".replace('/0/0/', '/' + hostId + '/' + commandId + '/');
+
+            // Ajusta a URL de ação e mostra o spinner
+            $('#uploadForm').attr('action', actionUrl);
+            $('#loadingSpinner').removeClass('d-none');
+            $('#uploadForm')[0].submit();
+        }
+
+        // Evento de envio do formulário
+        $('#uploadForm').on('submit', function(event) {
+            event.preventDefault(); 
+
+            // Verifica a validação antes do envio
+            if (validateForm()) {
+                submitForm();
+            }
+        });
+    });
+</script>
+
 
 {% endblock %}

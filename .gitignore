@@ -8,5 +8,6 @@ uploads/*
 **/docker/banco/mysql/*
 **/docker/redis/*
 **/.docker/*
-*.pyc
+**/*pyc
+**pyc
 *.sqlite3
