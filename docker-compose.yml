@@ -1,0 +1,20 @@
+version: '3'
+services:
+  loader:
+    container_name: loader
+    build:
+      context: .
+    volumes:
+      - app:/app
+    ports:
+      - "80:8000"
+    networks:
+      - network_app
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG}
+    env_file:
+      - .env
+    command: >
+      bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --insecurite"
+    restart: unless-stopped
