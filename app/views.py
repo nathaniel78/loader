@@ -11,6 +11,7 @@ from .utils import hash_person, pagination_utils
 from django.contrib.messages import constants
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import (
     HostForm, 
     CommandForm,
@@ -19,6 +20,11 @@ from .forms import (
 
 logger = logging.getLogger(__name__)
 
+# Logout
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
 
 # View login
 class LoginView(View):
@@ -26,10 +32,12 @@ class LoginView(View):
         form_login = CustomLoginForm()
         context = {'form_login': form_login}
         return render(request, 'pages/login.html', context)
+    
 
     def post(self, request):
         try:
             form_login = CustomLoginForm(request, data=request.POST)
+            
             if form_login.is_valid():
                 username = form_login.cleaned_data["username"]
                 print(username)
@@ -37,32 +45,39 @@ class LoginView(View):
                 user = authenticate(request, username=username, password=password)
 
                 if user is not None:
-                    if not user.ativo:
-                        messages.add_message(request, constants.INFO, 
-                                             'Usuário inativo, entre em contato com o administrador.')
+                    if not user.is_active:
+                        messages.error(
+                        request, 
+                        'Usuário inativo, entre em contato com o administrador do sistema'
+                        )
                         return redirect('login')
                     else:
                         login(request, user)
-                        return redirect('home')
+                        return redirect('upload')
                 else:
-                    messages.add_message(request, constants.INFO, 
-                                         'Credenciais incorretas, tente novamente ou entre em contato com o administrador.')
+                    messages.error(request, 'Credenciais de usuário incorretas')
                     return redirect('login')
-            else:
-                messages.add_message(request, constants.INFO, 
-                                     'Formulário inválido. Por favor, corrija os erros e tente novamente.')
 
             context = {'form_login': form_login}
             return render(request, 'pages/login.html', context)
         
         except ValueError:
-            print("Erro ao carregar login em views")
-            messages.add_message(request, constants.ERROR, "Erro ao processar o login.")
+            messages.error(request, 'Erro ao processar login')
             return redirect('login')
     
 
 # View upload
-class UploadView(View):
+class UploadView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def get(self, request):
         hosts = Host.objects.all()
         commands = Command.objects.all()
@@ -75,7 +90,17 @@ class UploadView(View):
 
 
 # View home upload
-class UploadActionView(View):
+class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def post(self, request, host_id, command_id):
         command = get_object_or_404(Command, id=command_id)
         host = get_object_or_404(Host, id=host_id)
@@ -175,7 +200,17 @@ class UploadActionView(View):
     
  
 # View command
-class CommandView(View):
+class CommandView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def get(self, request):
         lista = Command.objects.all()
         commands = pagination_utils.Pagination.pg_default(request, lista, 10)
@@ -187,7 +222,17 @@ class CommandView(View):
     
 
 # View command create
-class CommandCreateView(View):
+class CommandCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def get(self, request):
         commands = Command.objects.all()
         form = CommandForm()
@@ -209,7 +254,17 @@ class CommandCreateView(View):
 
 
 # View Command update
-class CommandUpdateView(View):
+class CommandUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def get(self, request, id):
         instancia = get_object_or_404(Command, id=id)
         form = CommandForm(instance=instancia)
@@ -241,7 +296,17 @@ class CommandUpdateView(View):
 
 
 # View command delete
-class CommandDeleteView(View):
+class CommandDeleteView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def get(self, request, id):
         command = get_object_or_404(Command, id=id)
         
@@ -253,7 +318,17 @@ class CommandDeleteView(View):
 
 
 # View host
-class HostView(View):
+class HostView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def get(self, request):
         lista = Host.objects.all()
         hosts = pagination_utils.Pagination.pg_default(request, lista, 10)
@@ -265,7 +340,17 @@ class HostView(View):
 
 
 # View host create
-class HostCreateView(View):
+class HostCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def get(self, request):
         form = HostForm()
         context = {
@@ -286,7 +371,17 @@ class HostCreateView(View):
     
 
 # View host update
-class HostUpdateView(View):
+class HostUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def get(self, request, id):
         instancia = get_object_or_404(Host, id=id)
         form = HostForm(instance=instancia)
@@ -326,7 +421,17 @@ class HostUpdateView(View):
 
 
 # View host delete
-class HostDeleteView(View):
+class HostDeleteView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_active
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and not self.request.user.is_active:
+            messages.warning(self.request, "Sua conta está inativa. Entre em contato com o administrador.")
+        else:
+            messages.error(self.request, "Você precisa estar logado para acessar esta página.")
+        return redirect('login')
+    
     def get(self, request, id):
         host = get_object_or_404(Host, id=id)
         
