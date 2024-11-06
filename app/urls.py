@@ -11,10 +11,12 @@ from .views import (
     CommandUpdateView,
     CommandDeleteView,
     LoginView,
+    logout_view,
 )
 
 urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
+    path('logout/', logout_view, name='logout'),
     path('upload/', UploadView.as_view(), name='upload'),
     path('upload/<int:host_id>/<int:command_id>/', UploadActionView.as_view(), name='uploader'),
     path('host/list/', HostView.as_view(), name='host_list'),
