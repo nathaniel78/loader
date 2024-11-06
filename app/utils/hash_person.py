@@ -32,6 +32,7 @@ class PasswordFernetKey:
         try:
             host = Host.objects.get(id=id)
             pwd_after = host.host_password
+            print('id ->', id)
             print(f"Senha criptografada recuperada do banco: {pwd_after}")
 
             # Descriptografa a senha
