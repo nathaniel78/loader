@@ -27,43 +27,43 @@ def logout_view(request):
 
 
 # View login
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.views import View
+from .forms import CustomLoginForm
+
+
 class LoginView(View):
     def get(self, request):
         form_login = CustomLoginForm()
         context = {'form_login': form_login}
         return render(request, 'pages/login.html', context)
-    
 
     def post(self, request):
-        try:
-            form_login = CustomLoginForm(request, data=request.POST)
-            
-            if form_login.is_valid():
-                username = form_login.cleaned_data["username"]
-                print(username)
-                password = form_login.cleaned_data["password"]
-                user = authenticate(request, username=username, password=password)
-
-                if user is not None:
-                    if not user.is_active:
-                        messages.error(
-                        request, 
-                        'Usuário inativo, entre em contato com o administrador do sistema'
-                        )
-                        return redirect('login')
-                    else:
-                        login(request, user)
-                        return redirect('upload')
-                else:
-                    messages.error(request, 'Credenciais de usuário incorretas')
-                    return redirect('login')
-
-            context = {'form_login': form_login}
-            return render(request, 'pages/login.html', context)
+        form_login = CustomLoginForm(request, data=request.POST)
         
-        except ValueError:
-            messages.error(request, 'Erro ao processar login')
-            return redirect('login')
+        if form_login.is_valid():
+            # Usando o AuthenticationForm para autenticar o usuário
+            username = form_login.cleaned_data['username']
+            password = form_login.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return redirect('upload')
+                else:
+                    messages.error(request, 'Usuário inativo, entre em contato com o administrador.')
+                    return redirect('login')
+            else:
+                messages.error(request, 'Credenciais incorretas.')
+                return redirect('login')
+
+        # Caso o formulário não seja válido, exibe erros no template
+        context = {'form_login': form_login}
+        return render(request, 'pages/login.html', context)
     
 
 # View upload
