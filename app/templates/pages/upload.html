@@ -85,10 +85,10 @@
             }
 
             // Valida as extensões permitidas
-            var validExtensions = ['zip', 'rar'];
+            var validExtensions = ['zip', 'rar', 'ear'];
             var fileExtension = file.name.split('.').pop().toLowerCase();
             if (!validExtensions.includes(fileExtension)) {
-                $('#error-message').text('Tipo de arquivo não permitido. Apenas arquivos ZIP, RAR são aceitos.');
+                $('#error-message').text('Tipo de arquivo não permitido. Apenas arquivos ZIP, RAR, EAR são aceitos.');
                 return false;
             }
 
