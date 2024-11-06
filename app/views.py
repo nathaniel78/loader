@@ -110,9 +110,9 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
         commands = Command.objects.all()
         
         if not uploaded_file:
-            messages.add_message(request, constants.ERROR, "Nenhum arquivo foi enviado.")
+            messages.add_message(request, constants.INFO, "Nenhum arquivo foi enviado.")
             return redirect('home')
-        
+        print('--------->', host_id)
         password_decrypt = hash_person.PasswordFernetKey.return_hash(host.id)
 
         # Configurações do Host
@@ -173,11 +173,11 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
             messages.add_message(request, constants.SUCCESS, "Arquivo enviado com sucesso.")
         
         except socket.timeout:
-            messages.add_message(request, constants.ERROR, "O comando excedeu o tempo limite de execução.")
+            messages.add_message(request, constants.INFO, "O comando excedeu o tempo limite de execução.")
             logger.error("O comando excedeu o tempo limite de execução.")
         
         except Exception as e:
-            messages.add_message(request, constants.ERROR, f"Ocorreu um erro: {e}.")
+            messages.add_message(request, constants.INFO, f"Ocorreu um erro: {e}.")
             logger.error(f"Ocorreu um erro ao conectar e enviar o arquivo: {e}")
         
         finally:
@@ -362,7 +362,8 @@ class HostCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
         form = HostForm(request.POST)
         if form.is_valid():
             host = form.save(commit=False)
-            host.host_password = hash_person.PasswordFernetKey.make_hash(form.cleaned_data["host_password"])
+            password = request.POST.get("password")
+            host.host_password = hash_person.PasswordFernetKey.make_hash(password)
             host.save()
             messages.add_message(request, constants.SUCCESS, 
                                      'Cadastro realizado com sucesso.')

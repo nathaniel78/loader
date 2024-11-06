@@ -10,4 +10,5 @@ uploads/*
 **/.docker/*
 **/*pyc
 **pyc
+*.pyc
 *.sqlite3
