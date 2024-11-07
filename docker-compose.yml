@@ -13,9 +13,9 @@ services:
     environment:
       SECRET_KEY: 'django-insecure-pjnbudk(+-8r+&@$fgx2#indc3-3!mbgrtnh07n*m*!ldyd&!_'
       ALLOWED_HOSTS: "*"
-      DEBUG: "False"
+      DEBUG: "True"
     command: bash -c "
-      python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000 --insecure"
+      python manage.py migrate && python manage.py makemigrations && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000 --insecure"
     restart: unless-stopped
 
 volumes:

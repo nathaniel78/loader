@@ -10,6 +10,7 @@ class Host(models.Model):
     host_user = models.CharField(max_length=50, blank=False, null=False)
     host_password = models.CharField(max_length=200, blank=True, null=True)
     host_dir = models.CharField(max_length=255, blank=False, null=False)
+    host_cert = models.CharField(max_length=255, blank=True, null=True)
     date_create = models.DateTimeField(auto_now_add=True, editable=False)
     date_update = models.DateTimeField(auto_now=True)
 

@@ -13,7 +13,7 @@ class CustomLoginForm(AuthenticationForm):
 class HostForm(forms.ModelForm):
     class Meta:
         model = Host
-        fields = ['host_ip', 'host_user', 'host_password', 'host_dir']
+        fields = ['host_ip', 'host_user', 'host_password', 'host_dir', 'host_cert']
 
 
 class CommandForm(forms.ModelForm):

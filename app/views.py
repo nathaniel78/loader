@@ -105,12 +105,16 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
         command = get_object_or_404(Command, id=command_id)
         host = get_object_or_404(Host, id=host_id)
         uploaded_file = request.FILES.get("file")
-        
+
         hosts = Host.objects.all()
         commands = Command.objects.all()
-        
+
         if not uploaded_file:
             messages.add_message(request, constants.INFO, "Nenhum arquivo foi enviado.")
+            return redirect('home')
+
+        if not command or not host:
+            messages.add_message(request, constants.INFO, "Campos host e comando são obrigatórios.")
             return redirect('home')
 
         password_decrypt = hash_person.PasswordFernetKey.return_hash(host.id)
@@ -119,13 +123,14 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
         ip = host.host_ip
         username = host.host_user
         password = password_decrypt
+        cert = host.host_cert
         remote_dir = host.host_dir
 
         # Salva o arquivo temporariamente e obtém o nome original
         original_filename = uploaded_file.name
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_file.write(uploaded_file.read())
-            temp_file_path = temp_file.name 
+            temp_file_path = temp_file.name
 
         stdout_before = ""
         stderr_before = ""
@@ -135,11 +140,20 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
         pre_upload_message = "Comando pré-upload não executado."
         post_upload_message = "Comando pós-upload não executado."
 
+        ssh = None
+
         try:
-            # Conexão SSH
+            # Conexão SSH com base nas credenciais
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(ip, username=username, password=password)
+
+            if host.host_password and not host.host_cert:
+                ssh.connect(ip, username=username, password=password)
+            elif not host.host_password and host.host_cert:
+                ssh.connect(ip, username=username, key_filename=cert)
+            else:
+                messages.add_message(request, constants.ERROR, "Configuração inválida de autenticação para o host.")
+                return redirect('home')
 
             # Define um tempo limite (em segundos)
             command_timeout = 120
@@ -149,10 +163,7 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
                 stdin, stdout, stderr = ssh.exec_command(command.command_before, timeout=command_timeout)
                 stdout_before = stdout.read().decode()
                 stderr_before = stderr.read().decode()
-                if stderr_before:
-                    pre_upload_message = f"Erro no comando pré-upload: {stderr_before}"
-                else:
-                    pre_upload_message = "Comando pré-upload executado com sucesso."
+                pre_upload_message = f"Erro no comando pré-upload: {stderr_before}" if stderr_before else "Comando pré-upload executado com sucesso."
 
             # Envia o arquivo via SCP com o nome original
             with SCPClient(ssh.get_transport()) as scp:
@@ -165,23 +176,21 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
                 stdin, stdout, stderr = ssh.exec_command(command.command_after, timeout=command_timeout)
                 stdout_after = stdout.read().decode()
                 stderr_after = stderr.read().decode()
-                if stderr_after:
-                    post_upload_message = f"Erro no comando pós-upload: {stderr_after}"
-                else:
-                    post_upload_message = "Comando pós-upload executado com sucesso."
+                post_upload_message = f"Erro no comando pós-upload: {stderr_after}" if stderr_after else "Comando pós-upload executado com sucesso."
 
             messages.add_message(request, constants.SUCCESS, "Arquivo enviado com sucesso.")
-        
+
         except socket.timeout:
             messages.add_message(request, constants.INFO, "O comando excedeu o tempo limite de execução.")
             logger.error("O comando excedeu o tempo limite de execução.")
-        
+
         except Exception as e:
-            messages.add_message(request, constants.INFO, f"Ocorreu um erro: {e}.")
+            messages.add_message(request, constants.ERROR, f"Ocorreu um erro: {e}.")
             logger.error(f"Ocorreu um erro ao conectar e enviar o arquivo: {e}")
-        
+
         finally:
-            ssh.close()
+            if ssh:
+                ssh.close()
             os.remove(temp_file_path)
 
         context = {
@@ -194,8 +203,7 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
             'hosts': hosts,
             'commands': commands,
         }
-        context.update()
-        
+
         return render(request, 'pages/upload.html', context)
     
  
@@ -361,16 +369,26 @@ class HostCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
     def post(self, request):
         form = HostForm(request.POST)
         if form.is_valid():
-            host = form.save(commit=False)
-            password = request.POST.get("password")
-            host.host_password = hash_person.PasswordFernetKey.make_hash(password)
-            host.save()
-            messages.add_message(request, constants.SUCCESS, 
-                                     'Cadastro realizado com sucesso.')
-            return redirect('host_list')
+            password = form.cleaned_data.get("host_password")
+            cert = form.cleaned_data.get("host_cert")
+
+            if not password and not cert:
+                messages.add_message(
+                    request,
+                    constants.INFO,
+                    "É necessário preencher ao menos um dos campos: senha ou certificado do host."
+                )
+            else:
+                host = form.save(commit=False)
+                if password:
+                    host.host_password = hash_person.PasswordFernetKey.make_hash(password)
+                host.save()
+                messages.add_message(request, constants.SUCCESS, "Cadastro realizado com sucesso.")
+                return redirect('host_list')
+
         return render(request, 'pages/host_form.html', {'form': form})
     
-
+    
 # View host update
 class HostUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
@@ -392,31 +410,34 @@ class HostUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def post(self, request, id):
         host_instance = get_object_or_404(Host, id=id)
-        form = HostForm(request.POST, instance=host_instance)        
+        form = HostForm(request.POST, instance=host_instance)
 
         if form.is_valid():
             host = form.save(commit=False)
             host.host_ip = form.cleaned_data["host_ip"]
             host.host_user = form.cleaned_data["host_user"]
             host.host_dir = form.cleaned_data["host_dir"]
-
-            password_old = request.POST.get("host_password")
             
-            password_new = request.POST.get("password", "").strip()
+            # Atualiza o certificado e limpa a senha se o certificado estiver presente
+            if form.cleaned_data["host_cert"]:
+                host.host_cert = form.cleaned_data["host_cert"]
+                host.host_password = ''  # Limpa o campo de senha se o certificado é preenchido
+            
+            # Atualiza a senha se o certificado não estiver presente
+            elif not form.cleaned_data["host_cert"]:
+                password_old = host_instance.host_password
+                password_new = request.POST.get("password", "").strip()
 
-            if password_new == '' or password_new == None:
-                host.host_password = password_old
-                
-            else:
-                host.host_password = hash_person.PasswordFernetKey.make_hash(password_new)
-
+                # Mantém a senha antiga se o novo valor estiver vazio, caso contrário, faz o hash da nova senha
+                host.host_password = password_old if not password_new else hash_person.PasswordFernetKey.make_hash(password_new)
+            
             host.save()
             
-            messages.add_message(request, constants.SUCCESS, 
-                                     'Atualização realizada com sucesso.')
+            messages.add_message(request, constants.SUCCESS, "Atualização realizada com sucesso.")
             return redirect('host_list')
         
         return render(request, 'pages/host_form.html', {'form': form})
+
 
 
 # View host delete

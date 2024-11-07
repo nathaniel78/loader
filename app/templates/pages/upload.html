@@ -12,20 +12,26 @@
   <form action="{% url 'uploader' 0 0 %}" method="post" enctype="multipart/form-data" id="uploadForm">
     {% csrf_token %}
     
-    <div class="custom-file mb-3">
+    <div class="mb-3">
+        <label for="hostSelect" class="form-label">Host</label>
         <select class="form-control form-control-lg" name="host_id" id="hostSelect" required>
             <option value="">Selecione um host</option>
             {% for host in hosts %}
             <option value="{{ host.id }}">{{ host }}</option>
+            {% empty %}
+            <option value="">Não existem registros</option>
             {% endfor %}
         </select>
     </div>
-
-    <div class="custom-file mb-3">
+    
+    <div class="mb-3">
+        <label for="commandSelect" class="form-label">Comando</label>
         <select class="form-control form-control-lg" name="command_id" id="commandSelect" required>
             <option value="">Selecione um comando</option>
             {% for command in commands %}
             <option value="{{ command.id }}">{{ command }}</option>
+            {% empty %}
+            <option value="">Não existem registros</option>
             {% endfor %}
         </select>
     </div>
@@ -78,9 +84,9 @@
             }
 
             // Valida o tamanho do arquivo
-            var maxSize = 250 * 1024 * 1024; // 250 MB
+            var maxSize = 300 * 1024 * 1024; // 300 MB
             if (file.size > maxSize) {
-                $('#error-message').text('O arquivo não pode exceder 250 MB.');
+                $('#error-message').text('O arquivo não pode exceder 300 MB.');
                 return false;
             }
 
