@@ -78,9 +78,9 @@
             }
 
             // Valida o tamanho do arquivo
-            var maxSize = 100 * 1024 * 1024; // 100 MB
+            var maxSize = 250 * 1024 * 1024; // 250 MB
             if (file.size > maxSize) {
-                $('#error-message').text('O arquivo não pode exceder 100 MB.');
+                $('#error-message').text('O arquivo não pode exceder 250 MB.');
                 return false;
             }
 

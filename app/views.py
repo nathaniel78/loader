@@ -112,7 +112,7 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
         if not uploaded_file:
             messages.add_message(request, constants.INFO, "Nenhum arquivo foi enviado.")
             return redirect('home')
-        print('--------->', host_id)
+
         password_decrypt = hash_person.PasswordFernetKey.return_hash(host.id)
 
         # Configurações do Host
@@ -401,10 +401,8 @@ class HostUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
             host.host_dir = form.cleaned_data["host_dir"]
 
             password_old = request.POST.get("host_password")
-            print("Senha antiga:", password_old)
             
             password_new = request.POST.get("password", "").strip()
-            print("Senha nova:", password_new)
 
             if password_new == '' or password_new == None:
                 host.host_password = password_old
