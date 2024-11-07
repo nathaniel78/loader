@@ -22,6 +22,15 @@
       {% endif %}
       {{ form.host_user|attr:"class:form-control form-control-lg"|attr:"placeholder:Usuário, exemplo, root ou admin"|attr:"id:host_user"|attr:"name:host_user" }}
     </div>
+    
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" checked>
+      <label class="form-check-label" for="inlineRadio1">Password</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+      <label class="form-check-label" for="inlineRadio2">Certificado</label>
+    </div>
 
     <div class="custom-file mb-3">
       {% if form.host_password.field.required %}
@@ -29,8 +38,17 @@
       {% else %}
           <label for="host_password" class="form-label">Password do Host</label>
       {% endif %}
-      <input type="password" class="form-control form-control-lg" id="password" name="password">
+      <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Digite a senha do host">
       <input type="hidden" value="{{ form.instance.host_password }}" name="host_password" id="host_password">
+    </div>
+
+    <div class="custom-file mb-3">
+      {% if form.host_cert.field.required %}
+          <label for="host_cert" class="form-label">Diretorio do Certificado <span class="text-danger">*</span></label>
+      {% else %}
+          <label for="host_cert" class="form-label">Diretorio do Certificado</label>
+      {% endif %}
+      {{ form.host_cert|attr:"class:form-control form-control-lg"|attr:"placeholder:Caminho absoluto do diretório onde está o certificado para conexão ssh"|attr:"id:host_cert"|attr:"name:host_cert" }}
     </div>
 
     <div class="custom-file mb-3">
@@ -49,4 +67,28 @@
       </svg>
     </button>
   </form>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Função para habilitar/desabilitar os campos com base na seleção do radio
+      function toggleFields() {
+        if ($('#inlineRadio1').is(':checked')) {
+          $('#password').prop('disabled', false);
+          $('#host_cert').prop('disabled', true).val('');
+        } else if ($('#inlineRadio2').is(':checked')) {
+          $('#password').prop('disabled', true).val('');
+          $('#host_cert').prop('disabled', false);
+        }
+      }
+  
+      // Chama a função ao alterar o radio
+      $('input[name="inlineRadioOptions"]').change(function() {
+        toggleFields();
+      });
+  
+      // Chama a função inicialmente para definir o estado inicial dos campos
+      toggleFields();
+    });
+  </script>
 {% endblock %}

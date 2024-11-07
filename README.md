@@ -6,7 +6,7 @@ Este código está disponível para uso com restrições comerciais e requer aut
 
 ## Sobre:
 ```
-Loader é um aplicativo para realizar ações pós e após o upload do arquivo.
+Loader é um aplicativo para realizar ações pós e após o upload do arquivo que aceita tando senha como sem e certificado para conexão ssh.
 ```
 
 ## Instalar:
