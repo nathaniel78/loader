@@ -40,6 +40,12 @@
       {% endif %}
       <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Digite a senha do host">
       <input type="hidden" value="{{ form.instance.host_password }}" name="host_password" id="host_password">
+      <label for="host_cert" class="form-label">Senha registrada: 
+        <span class="text-danger">
+          {% if form.instance.host_password %}
+          Sim
+          {% endif %}
+        </span></label>
     </div>
 
     <div class="custom-file mb-3">
@@ -49,6 +55,7 @@
           <label for="host_cert" class="form-label">Diretorio do Certificado</label>
       {% endif %}
       {{ form.host_cert|attr:"class:form-control form-control-lg"|attr:"placeholder:Caminho absoluto do diretório onde está o certificado para conexão ssh"|attr:"id:host_cert"|attr:"name:host_cert" }}
+      <label for="host_cert" class="form-label">Diretório do certs: <span class="text-danger">{{ form.instance.host_cert }}</span></label>
     </div>
 
     <div class="custom-file mb-3">
