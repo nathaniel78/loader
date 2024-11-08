@@ -369,7 +369,7 @@ class HostCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
     def post(self, request):
         form = HostForm(request.POST)
         if form.is_valid():
-            password = form.cleaned_data.get("host_password")
+            password = request.POST.get("password", "").strip() or None
             cert = form.cleaned_data.get("host_cert")
 
             if not password and not cert:
@@ -382,11 +382,14 @@ class HostCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                 host = form.save(commit=False)
                 if password:
                     host.host_password = hash_person.PasswordFernetKey.make_hash(password)
+                else:
+                    host.host_password = ""  # ou None, se desejar limpar o campo
                 host.save()
                 messages.add_message(request, constants.SUCCESS, "Cadastro realizado com sucesso.")
                 return redirect('host_list')
 
         return render(request, 'pages/host_form.html', {'form': form})
+
     
     
 # View host update
@@ -421,10 +424,11 @@ class HostUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
             # Atualiza o certificado e limpa a senha se o certificado estiver presente
             if form.cleaned_data["host_cert"]:
                 host.host_cert = form.cleaned_data["host_cert"]
-                host.host_password = ''  # Limpa o campo de senha se o certificado é preenchido
+                host.host_password = '' 
             
             # Atualiza a senha se o certificado não estiver presente
             elif not form.cleaned_data["host_cert"]:
+                host.host_cert = ''
                 password_old = host_instance.host_password
                 password_new = request.POST.get("password", "").strip()
 
