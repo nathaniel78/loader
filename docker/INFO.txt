@@ -1,0 +1,14 @@
+# ----------------------- SOBRE ----------------------#
+1 - Comandos pós: pode ser executado n comandos listados, lembrando que em cenários que não seja o usuário root
+deve ser utilizado sempre sudo e que esse usuário tenha permissão para tal. Exemplo:
+sudo adduser novousuario
+sudo usermod -aG sudo novousuario
+
+2 - Verificar qual usuário está em execução no docker-compose:
+sudo docker exec -it loader whoami
+
+3 - Instalação do docker: https://docs.docker.com/engine/install/ubuntu/
+
+4 - Configurando permissão para docker, evitando com isso o sudo:
+sudo adduser docker
+sudo usermod -aG sudo docker
