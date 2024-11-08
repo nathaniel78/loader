@@ -11,7 +11,7 @@ Loader é um aplicativo para realizar ações pós e após o upload do arquivo q
 
 ## Instalar:
 ```
-1 - Depois de baixar o projeto, modificar no docker-compose o ALLOWED_HOSTS se necessário.
+1 - Depois de baixar o projeto, copie para raiz o .env.exemple como .env e coloque os valores.
 2 - Executar o comando docker-compose up -d --build
 3 - Criar um usuário com o comando docker exec -it loader python manage.py createsuperuser
 4 - Campos obrigatório, usuário e password.

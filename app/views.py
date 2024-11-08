@@ -111,11 +111,15 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
 
         if not uploaded_file:
             messages.add_message(request, constants.INFO, "Nenhum arquivo foi enviado.")
-            return redirect('home')
+            return redirect('upload')
 
         if not command or not host:
             messages.add_message(request, constants.INFO, "Campos host e comando são obrigatórios.")
-            return redirect('home')
+            return redirect('upload')
+        
+        if not os.path.exists(host.host_cert):
+            messages.add_message(request, constants.INFO, "Certificado não encontrado: {host.host_cert}.")
+            return redirect('upload')
 
         password_decrypt = hash_person.PasswordFernetKey.return_hash(host.id)
 
@@ -152,8 +156,8 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
             elif not host.host_password and host.host_cert:
                 ssh.connect(ip, username=username, key_filename=cert)
             else:
-                messages.add_message(request, constants.ERROR, "Configuração inválida de autenticação para o host.")
-                return redirect('home')
+                messages.add_message(request, constants.INFO, "Configuração inválida de autenticação para o host.")
+                return redirect('upload')
 
             # Define um tempo limite (em segundos)
             command_timeout = 120
@@ -382,8 +386,9 @@ class HostCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
                 host = form.save(commit=False)
                 if password:
                     host.host_password = hash_person.PasswordFernetKey.make_hash(password)
+                    host.host_cert = ""
                 else:
-                    host.host_password = ""  # ou None, se desejar limpar o campo
+                    host.host_password = "" 
                 host.save()
                 messages.add_message(request, constants.SUCCESS, "Cadastro realizado com sucesso.")
                 return redirect('host_list')
