@@ -6,7 +6,7 @@ Este código está disponível para uso com restrições comerciais e requer aut
 
 ## Sobre:
 ```
-Loader é um aplicativo para realizar ações pós e após o upload do arquivo que aceita tando senha como sem e certificado para conexão ssh.
+Loader é um aplicativo para realizar ações pós e após o upload do arquivo que aceita tanto senha como certificado para conexão ssh.
 ```
 
 ## Instalar:
@@ -18,8 +18,8 @@ Loader é um aplicativo para realizar ações pós e após o upload do arquivo q
 5 - Caso necessite resetar a senha docker exec -it loader python manage.py changepassword seu_usuario
 6 - Demais comandos docker exec -it loader python manage.py --help
 
-Obs: no docker-compose o trecho que está com o comentário sobre o volume do certs, ele deve ser comentado, baso a aplicação
-esteja rodando direto no host, nesse caso deve ser comentado esse volume, caso esteja rodando em docker, container, deve
+Obs: no docker-compose o trecho que está com o comentário sobre o volume do certs, ele deve ser comentado, caso a aplicação
+esteja rodando direto no host, neste caso deve ser comentado esse volume, caso esteja rodando em docker, container, deve
 passar os valores, PATH_CERTS e NAME_CERTS, sendo o caminho absoluto do certificado no host e o nome do arquivo, exemplo,
 /root/.certs e certs.pem. Lembre-se que o arquivo deve ser dado a permissão apenas de leitura, questão de segurança, com
 chmod 400 caminho/nome_arquivo.pem.
@@ -48,4 +48,9 @@ sudo echo "Foi executado o loader ---> $(date +%d%m%Y%H%M%S)" >> ~/loader.log
 sudo ls /usr/local/sig/applications/ && \
 # Inicia jboss
 sudo /etc/init.d/jboss start
+```
+
+## Upload:
+```
+1 - O formato, extensão, aceitas são rar, zip e ear com tamanho de 300 megas, mas que podem ser ajustados conforme a necessidade, no arquivo upload.html em /app/templates/pages/upload.html no final do html em javascript
 ```
