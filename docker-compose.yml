@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   loader:
     container_name: loader
@@ -6,16 +6,22 @@ services:
       context: .
     volumes:
       - .:/app
+      # Volume abaixo é para ambiente em container, apontar o caminho e nome do certificado de .env
+      - "${PATH_CERTS}/${NAME_CERTS}:/root/.certs/${NAME_CERTS}:ro" # Caminho padrão container /root/.certs
     ports:
       - "80:8000"
     networks:
       - network_app
     environment:
-      SECRET_KEY: 'django-insecure-pjnbudk(+-8r+&@$fgx2#indc3-3!mbgrtnh07n*m*!ldyd&!_'
-      ALLOWED_HOSTS: "*"
-      DEBUG: "True"
-    command: bash -c "
-      python manage.py migrate && python manage.py makemigrations && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000 --insecure"
+      SECRET_KEY: "${SECRET_KEY}"
+      ALLOWED_HOSTS: "${ALLOWED_HOSTS}"
+      DEBUG: "${DEBUG}"
+    working_dir: /app
+    command: >
+      bash -c "python manage.py migrate &&
+               python manage.py makemigrations &&
+               python manage.py collectstatic --noinput &&
+               python manage.py runserver 0.0.0.0:8000 --insecure"
     restart: unless-stopped
 
 volumes:
@@ -23,4 +29,3 @@ volumes:
 
 networks:
   network_app:
-
