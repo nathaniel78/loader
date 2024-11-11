@@ -12,3 +12,4 @@ uploads/*
 **pyc
 *.pyc
 *.sqlite3
+__pycache__/
