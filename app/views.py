@@ -116,10 +116,6 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
         if not command or not host:
             messages.add_message(request, constants.INFO, "Campos host e comando são obrigatórios.")
             return redirect('upload')
-        
-        if not os.path.exists(host.host_cert):
-            messages.add_message(request, constants.INFO, "Certificado não encontrado: {host.host_cert}.")
-            return redirect('upload')
 
         password_decrypt = hash_person.PasswordFernetKey.return_hash(host.id)
 

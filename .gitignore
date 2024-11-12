@@ -12,4 +12,5 @@ uploads/*
 **pyc
 *.pyc
 *.sqlite3
+**/app/migrations/*_initial.py
 __pycache__/
