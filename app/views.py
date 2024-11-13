@@ -1,17 +1,20 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth import authenticate, login, logout
+from .utils import hash_person, pagination_utils
+from django.contrib.messages import constants
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect
+from django.utils.decorators import method_decorator
+from scp import SCPClient
+from django.views import View
+from .models import Host, Command
+from django.contrib import messages
 import os
 import logging
 import socket
 import paramiko
 import tempfile
-from scp import SCPClient
-from django.views import View
-from .models import Host, Command
-from django.contrib import messages
-from .utils import hash_person, pagination_utils
-from django.contrib.messages import constants
-from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import (
     HostForm, 
     CommandForm,
@@ -27,20 +30,13 @@ def logout_view(request):
 
 
 # View login
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.views import View
-from .forms import CustomLoginForm
-
-
 class LoginView(View):
     def get(self, request):
         form_login = CustomLoginForm()
         context = {'form_login': form_login}
         return render(request, 'pages/login.html', context)
 
+    @method_decorator(csrf_protect)
     def post(self, request):
         form_login = CustomLoginForm(request, data=request.POST)
         
@@ -101,6 +97,7 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
             messages.error(self.request, "Você precisa estar logado para acessar esta página.")
         return redirect('login')
     
+    @method_decorator(csrf_protect)
     def post(self, request, host_id, command_id):
         command = get_object_or_404(Command, id=command_id)
         host = get_object_or_404(Host, id=host_id)
@@ -249,6 +246,7 @@ class CommandCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(request, 'pages/command_form.html', context)
 
+    @method_decorator(csrf_protect)
     def post(self, request):
         form = CommandForm(request.POST)
         if form.is_valid():
@@ -282,7 +280,7 @@ class CommandUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(request, 'pages/command_form.html', context)
 
-
+    @method_decorator(csrf_protect)
     def post(self, request, id):
         Command_instance = get_object_or_404(Command, id=id)
         form = CommandForm(request.POST, instance=Command_instance)
@@ -366,6 +364,7 @@ class HostCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(request, 'pages/host_form.html', context)
 
+    @method_decorator(csrf_protect)
     def post(self, request):
         form = HostForm(request.POST)
         if form.is_valid():
@@ -411,7 +410,7 @@ class HostUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
 
         return render(request, 'pages/host_form.html', {'form': form, 'instancia': instancia})
 
-
+    @method_decorator(csrf_protect)
     def post(self, request, id):
         host_instance = get_object_or_404(Host, id=id)
         form = HostForm(request.POST, instance=host_instance)

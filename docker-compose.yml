@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/app
       # Volume abaixo é para ambiente em container, apontar o caminho e nome do certificado de .env
-      - "${PATH_CERTS}/${NAME_CERTS}:/root/.certs/${NAME_CERTS}:ro" # Caminho padrão container /root/.certs
+      #- "${PATH_CERTS}/${NAME_CERTS}:/root/.certs/${NAME_CERTS}:ro" # Caminho padrão container /root/.certs
     ports:
       - "80:8000"
     networks:
