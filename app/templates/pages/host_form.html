@@ -54,7 +54,7 @@
       {% else %}
           <label for="host_cert" class="form-label">Diretorio do Certificado</label>
       {% endif %}
-      {{ form.host_cert|attr:"class:form-control form-control-lg"|attr:"placeholder:Caminho absoluto do diretório onde está o certificado para conexão ssh"|attr:"id:host_cert"|attr:"name:host_cert" }}
+      {{ form.host_cert|attr:"class:form-control form-control-lg"|attr:"placeholder:Caminho mapeado dentro do container /root/.certs/nome_do_seu_certificado.pem"|attr:"id:host_cert"|attr:"name:host_cert" }}
       <label for="host_cert" class="form-label">Diretório do certs: <span class="text-danger">{{ form.instance.host_cert }}</span></label>
     </div>
 
