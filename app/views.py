@@ -182,7 +182,7 @@ class UploadActionView(LoginRequiredMixin, UserPassesTestMixin, View):
             logger.error("O comando excedeu o tempo limite de execução.")
 
         except Exception as e:
-            messages.add_message(request, constants.ERROR, f"Ocorreu um erro: {e}.")
+            messages.add_message(request, constants.INFO, f"Ocorreu um erro: {e}.")
             logger.error(f"Ocorreu um erro ao conectar e enviar o arquivo: {e}")
 
         finally:
