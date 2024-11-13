@@ -138,3 +138,7 @@ SESSION_COOKIE_AGE = int(os.environ.get('SESSION_COOKIE_AGE', default=6000))
 SESSION_SAVE_EVERY_REQUEST = True
 
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='')
+
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
