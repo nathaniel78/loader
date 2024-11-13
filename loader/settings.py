@@ -136,3 +136,5 @@ SESSION_COOKIE_AGE = int(os.environ.get('SESSION_COOKIE_AGE', default=6000))
 
 # Renovar a sessão
 SESSION_SAVE_EVERY_REQUEST = True
+
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='')
